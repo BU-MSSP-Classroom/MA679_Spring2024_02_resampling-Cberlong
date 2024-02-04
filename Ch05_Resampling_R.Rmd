@@ -148,6 +148,7 @@ mean(store)
 
 Comment on the results obtained.
 
+Any given observation has about a 63.5% chance of appearing in a bootstrap sample of the same size as the original dataset. 
 
 Your code:
 
@@ -179,6 +180,11 @@ y <- x - 2 * x^2 + rnorm (100)
 In this data set, what is n and what is p? Write out the model
 used to generate the data in equation form.
 
+n represents the number of observations, which is 100 in this case.
+
+p represents the number of predictors (or independent variables) used in the model
+
+The true model used is $y = x-2x^2 + e$ 
 
 Your code:
 
@@ -202,8 +208,10 @@ Please write your answer in full sentences.
 Your code:
 
 ```{r,echo=TRUE}
-#
-#
+set.seed (1)
+x <- rnorm (100)
+y <- x - 2 * x^2 + rnorm (100)
+plot(x, y, main="Scatterplot of X against Y", xlab="X", ylab="Y")
 ```
 
 Your answer:
@@ -211,6 +219,7 @@ Your answer:
 ~~~
 Please write your answer in full sentences.
 
+This pattern is consistent with the quadratic equation used to generate the plot. It has the concave down pattern which is indicated by the $-2x^2$.
 
 ~~~
 
@@ -228,8 +237,34 @@ to create a single data set containing both $X$ and $Y$ .
 Your code:
 
 ```{r,echo=TRUE}
-#
-#
+set.seed(1) # Ensure reproducibility
+x <- rnorm(100)
+y <- x - 2 * x^2 + rnorm(100)
+data <- data.frame(x, y)
+
+# Model i: Y = beta_0 + beta_1*X + epsilon
+model_i <- glm(y ~ x, data=data)
+cv_i <- cv.glm(data, model_i, K=nrow(data))
+
+# Model ii: Y = beta_0 + beta_1*X + beta_2*X^2 + epsilon
+data$x2 <- data$x^2
+model_ii <- glm(y ~ x + x2, data=data)
+cv_ii <- cv.glm(data, model_ii, K=nrow(data))
+
+# Model iii: Y = beta_0 + beta_1*X + beta_2*X^2 + beta_3*X^3 + epsilon
+data$x3 <- data$x^3
+model_iii <- glm(y ~ x + x2 + x3, data=data)
+cv_iii <- cv.glm(data, model_iii, K=nrow(data))
+
+# Model iv: Y = beta_0 + beta_1*X + beta_2*X^2 + beta_3*X^3 + beta_4*X^4 + epsilon
+data$x4 <- data$x^4
+model_iv <- glm(y ~ x + x2 + x3 + x4, data=data)
+cv_iv <- cv.glm(data, model_iv, K=nrow(data))
+
+# Print the LOOCV errors
+cv_errors <- c(cv_i$delta[1], cv_ii$delta[1], cv_iii$delta[1], cv_iv$delta[1])
+names(cv_errors) <- c("Model I", "Model II", "Model III", "Model IV")
+print(cv_errors)
 ```
 
 Your answer:
@@ -237,6 +272,7 @@ Your answer:
 ~~~
 Please write your answer in full sentences.
 
+The model with the lowest LOOCV error is considered to have the best predictive accuracy among the ones tested. In this case, it would be model II.
 
 ~~~
 
@@ -247,8 +283,34 @@ Are your results the same as what you got in (c)? Why?
 Your code:
 
 ```{r,echo=TRUE}
-#
-#
+set.seed(2023) # Ensure reproducibility
+x <- rnorm(100)
+y <- x - 2 * x^2 + rnorm(100)
+data <- data.frame(x, y)
+
+# Model i: Y = beta_0 + beta_1*X + epsilon
+model_i <- glm(y ~ x, data=data)
+cv_i <- cv.glm(data, model_i, K=nrow(data))
+
+# Model ii: Y = beta_0 + beta_1*X + beta_2*X^2 + epsilon
+data$x2 <- data$x^2
+model_ii <- glm(y ~ x + x2, data=data)
+cv_ii <- cv.glm(data, model_ii, K=nrow(data))
+
+# Model iii: Y = beta_0 + beta_1*X + beta_2*X^2 + beta_3*X^3 + epsilon
+data$x3 <- data$x^3
+model_iii <- glm(y ~ x + x2 + x3, data=data)
+cv_iii <- cv.glm(data, model_iii, K=nrow(data))
+
+# Model iv: Y = beta_0 + beta_1*X + beta_2*X^2 + beta_3*X^3 + beta_4*X^4 + epsilon
+data$x4 <- data$x^4
+model_iv <- glm(y ~ x + x2 + x3 + x4, data=data)
+cv_iv <- cv.glm(data, model_iv, K=nrow(data))
+
+# Print the LOOCV errors
+cv_errors <- c(cv_i$delta[1], cv_ii$delta[1], cv_iii$delta[1], cv_iv$delta[1])
+names(cv_errors) <- c("Model I", "Model II", "Model III", "Model IV")
+print(cv_errors)
 ```
 
 Your answer:
@@ -256,6 +318,7 @@ Your answer:
 ~~~
 Please write your answer in full sentences.
 
+Besides model I, the others don't change that much.
 
 ~~~
 
@@ -264,8 +327,9 @@ Please write your answer in full sentences.
 Your code:
 
 ```{r,echo=TRUE}
-#
-#
+cv_errors <- c(cv_i$delta[1], cv_ii$delta[1], cv_iii$delta[1], cv_iv$delta[1])
+names(cv_errors) <- c("Model I", "Model II", "Model III", "Model IV")
+print(cv_errors)
 ```
 
 Your answer:
@@ -273,6 +337,7 @@ Your answer:
 ~~~
 Please write your answer in full sentences.
 
+Model II would have the lowest LOOCV error. It's expected since its model is just the true model given.
 
 ~~~
 
